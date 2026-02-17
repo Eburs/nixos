@@ -18,9 +18,60 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.plymouth = {
     enable = true;
-    theme = "bgrt";
-    themePackages = [ pkgs.nixos-bgrt-plymouth ];
+    theme = "nixos-logo";
+    themePackages = [
+      (pkgs.stdenvNoCC.mkDerivation {
+        pname = "plymouth-theme-nixos-logo";
+        version = "1.0";
+        dontUnpack = true;
+        installPhase = ''
+          theme_dir="$out/share/plymouth/themes/nixos-logo"
+          mkdir -p "$theme_dir"
+
+          cat > "$theme_dir/nixos-logo.plymouth" <<'EOF'
+          [Plymouth Theme]
+          Name=NixOS Logo
+          Description=Centered NixOS logo only
+          ModuleName=script
+
+          [script]
+          ImageDir=/etc/plymouth/themes/nixos-logo
+          ScriptFile=/etc/plymouth/themes/nixos-logo/nixos-logo.script
+          EOF
+
+          cat > "$theme_dir/nixos-logo.script" <<'EOF'
+          Window.SetBackgroundTopColor(0, 0, 0);
+          Window.SetBackgroundBottomColor(0, 0, 0);
+          logo = Image("logo.png");
+          screen_width = Window.GetWidth();
+          screen_height = Window.GetHeight();
+          logo_width = logo.GetWidth();
+          logo_height = logo.GetHeight();
+          x = (screen_width - logo_width) / 2;
+          y = (screen_height - logo_height) / 2;
+          sprite = Sprite();
+          sprite.SetImage(logo);
+          sprite.SetPosition(x, y, 0);
+          EOF
+
+          install -m 0644 ${pkgs.nixos-icons}/share/icons/hicolor/256x256/apps/nix-snowflake-white.png "$theme_dir/logo.png"
+        '';
+      })
+    ];
   };
+  boot.consoleLogLevel = 0;
+  boot.initrd = {
+    verbose = false;
+    systemd.enable = true;
+  };
+  boot.kernelParams = [
+    "quiet"
+    "splash"
+    "loglevel=3"
+    "rd.systemd.show_status=false"
+    "rd.udev.log_level=3"
+    "vt.global_cursor_default=0"
+  ];
 
   # Use latest kernel.
   boot.kernelPackages = pkgs.linuxPackages_latest;
