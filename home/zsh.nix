@@ -8,9 +8,10 @@
 
     shellAliases = {
       ll = "ls -l";
-      update = "sudo nixos-rebuild switch --flake /etc/nixos#LabTop --impure";
+      update = "sudo nixos-rebuild switch --flake /etc/nixos#LabTop";
       sudo-nvim = "sudo -E nvim";
       edit-config = "cd /etc/nixos && codex";
+      venv = "source .venv/bin/activate";
     };
     history.size = 10000;
     oh-my-zsh = {

@@ -16,6 +16,11 @@
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  boot.plymouth = {
+    enable = true;
+    theme = "bgrt";
+    themePackages = [ pkgs.nixos-bgrt-plymouth ];
+  };
 
   # Use latest kernel.
   boot.kernelPackages = pkgs.linuxPackages_latest;
