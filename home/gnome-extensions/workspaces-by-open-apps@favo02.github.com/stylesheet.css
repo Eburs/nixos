@@ -1,0 +1,139 @@
+/*
+  please document margin and padding values,
+  the hardest thing to get right in css
+ */
+
+/* list of available classes (all prefixed with wboa-)
+
+  label: font size of labels
+  active > label (direct child): toggle color of labels
+  label-themed: use theme color for text (overrides default colors)
+
+  workspace: indicator spacing
+  workspace > label (direct child): workspace label color and spacing
+  workspace background (same element): background color and padding for active workspace
+
+  app (:hover and :focus): app icon hover effect
+  app > label (direct child): app group label color and spacing
+
+  rounded: round borders (5px)
+  panel-rounded: round borders (15px)
+  no-rounded: do not round borders
+
+  top: space for placing indicator at top
+  top active (same element): indicator at top
+  top no-indicator (same element): always disable indicator at top (add space for placing)
+
+  bottom: space for placing indicator at bottom
+  bottom active (same element): indicator at bottom
+  bottom no-indicator (same element): always disable indicator at bottom (add space for placing)
+*/
+
+/* --- labels (workspace name and apps count) --- */
+/* label size managed by size-workspace-label setting */
+.wboa-active > .wboa-label {
+  color: rgba(255, 255, 255, 1) !important;
+}
+
+/* themed label color: removes forced color to allow theme color */
+.wboa-label.wboa-label-themed {
+  color: inherit !important;
+}
+
+/* --- workspace indicator --- */
+/* workspace horizontal spacing is managed by spacing-workspace-{left, right} setttings */
+.wboa-workspace {
+  border: none;
+}
+
+/* workspace with background */
+.wboa-workspace.wboa-background {
+  /* background-color set inline by settings */
+  /* padding set inline by settings */
+}
+
+/* --- workspace label --- */
+/* workspace label spacing managed by spacing-label-{left, right, top, bottom} settings */
+.wboa-workspace > .wboa-label {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* --- app icon --- */
+/* app icon size managed by size-app-icon setting */
+/* app icon spacing managed by spacing-app-{left, right} settings */
+.wboa-app:hover, .wboa-app:focus {
+  /* hover effect */
+  margin-top: -2px;
+}
+/* symbolic icon */
+.wboa-symbolic-icons {
+  -st-icon-style: symbolic;
+}
+
+/* --- apps group label (x2, x3, ...) --- */
+.wboa-app > .wboa-label {
+  color: rgba(255, 255, 255, 0.4);
+  /* space horizontally app groups */
+  margin-right: 2px;
+}
+
+/* --- window title label --- */
+.wboa-window-title {
+  color: rgba(255, 255, 255, 0.7);
+  max-width: 200px;
+}
+
+/* --- COMMON --- */
+
+/* round indicator borders */
+.wboa-rounded {
+  border-radius: 5px;
+}
+/* round panel button borders */
+.wboa-panel-rounded {
+  border-radius: 15px !important;
+}
+/* do not round indicator borders */
+.wboa-no-rounded {
+  border-radius: 0px !important;
+}
+
+/* --- TOP indicators --- */
+.wboa-top {
+  border: none;
+  /* simulate presence of active indicator */
+  margin-top: 2px;
+}
+.wboa-top.wboa-active {
+  border-top: 2px solid white;
+  /* disable simulation of presence of active indicator */
+  margin-top: 0px;
+}
+.wboa-top.wboa-no-indicator {
+  border: none !important;
+  /* simulate presence of active indicator */
+  margin-top: 2px;
+}
+
+/* --- BOTTOM indicators --- */
+.wboa-bottom {
+  border: none;
+  /* simulate presence of active indicator */
+  margin-bottom: 2px;
+}
+.wboa-bottom.wboa-active {
+  border-bottom: 2px solid white;
+  /* disable simulation of presence of active indicator */
+  margin-bottom: 0px;
+}
+.wboa-bottom.wboa-no-indicator {
+  border: none !important;
+  /* simulate presence of active indicator */
+  margin-bottom: 2px;
+}
+
+/* --- Rename workspace entry --- */
+.rename-workspace-entry {
+  min-width: 150px;
+  padding: 4px 8px;
+}

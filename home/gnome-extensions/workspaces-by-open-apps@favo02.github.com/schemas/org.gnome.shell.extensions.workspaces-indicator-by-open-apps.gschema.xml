@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+
+  <!-- Compile with: glib-compile-schemas ./schemas/ -->
+
+  <enum id="org.gnome.shell.extensions.workspaces-indicator-by-open-apps.enum-position-in-panel">
+    <value value="0" nick="LEFT"/>
+    <value value="1" nick="CENTER"/>
+    <value value="2" nick="RIGHT"/>
+  </enum>
+
+  <enum id="org.gnome.shell.extensions.workspaces-indicator-by-open-apps.enum-apps-effects">
+    <value value="0" nick="NOTHING"/>
+    <value value="1" nick="REDUCE OPACITY"/>
+    <value value="2" nick="DESATURATE"/>
+  </enum>
+
+  <enum id="org.gnome.shell.extensions.workspaces-indicator-by-open-apps.enum-icons-group">
+    <value value="0" nick="OFF"/>
+    <value value="1" nick="GROUP AND SHOW COUNT"/>
+    <value value="2" nick="GROUP WITHOUT COUNT"/>
+  </enum>
+
+  <schema id="org.gnome.shell.extensions.workspaces-indicator-by-open-apps"
+    path="/org/gnome/shell/extensions/workspaces-indicator-by-open-apps/">
+
+    <!-- PAGE 1 GROUP 1: POSITION -->
+
+    <key name="position-in-panel" enum="org.gnome.shell.extensions.workspaces-indicator-by-open-apps.enum-position-in-panel">
+      <default>"LEFT"</default>
+      <summary>Panel position</summary>
+      <description>Panel to show the indicator in</description>
+    </key>
+
+    <key type="i" name="position-index">
+      <default>0</default>
+      <summary>Position index</summary>
+      <description>Number of other elements in the panel before the indicator</description>
+    </key>
+
+    <key type="b" name="hide-activities-button">
+      <default>true</default>
+      <summary>Hide GNOME workspace indicator</summary>
+      <description>Hide GNOME default workspace indicator (formerly "Activities" button)</description>
+    </key>
+
+    <!-- PAGE 1 GROUP 2: BEHAVIOR -->
+
+    <key type="b" name="scroll-enable">
+      <default>true</default>
+      <summary>Enable scroll</summary>
+      <description>Change workspace by scrolling the mouse wheel (or touchpad gesture) over the indicator</description>
+    </key>
+
+    <key type="b" name="scroll-wraparound">
+      <default>true</default>
+      <summary>Scroll wraparound</summary>
+      <description>Scrolling past the last workspace will wrap around to the first one (and viceversa)</description>
+    </key>
+
+    <key type="b" name="scroll-inverse">
+      <default>false</default>
+      <summary>Inverse scroll</summary>
+      <description>Invert the direction of scrolling</description>
+    </key>
+
+    <key type="b" name="middle-click-close-app">
+      <default>true</default>
+      <summary>Middle click closes app</summary>
+      <description>Clicking with the middle mouse button on an app icon will close the app</description>
+    </key>
+
+    <key type="b" name="click-on-active-overview">
+      <default>true</default>
+      <summary>Click on current workspace triggers overview</summary>
+      <description>Clicking the active workspace triggers overview</description>
+    </key>
+
+    <key type="b" name="click-on-focus-minimize">
+      <default>true</default>
+      <summary>Click on focused application to minimize</summary>
+      <description>Clicking on the current focused application will minimize it</description>
+    </key>
+
+    <!-- PAGE 2 GROUP 1: INDICATOR APPEARANCE -->
+
+    <key type="b" name="indicator-show-active-workspace">
+      <default>true</default>
+      <summary>Active workspace indicator</summary>
+      <description>Show an indicator below the current active workspace</description>
+    </key>
+
+    <key type="b" name="indicator-show-focused-app">
+      <default>true</default>
+      <summary>Focused app indicator</summary>
+      <description>Show an indicator above the current focused app</description>
+    </key>
+
+    <key type="s" name="indicator-color">
+      <default>"rgba(255,255,255,1)"</default>
+      <summary>Indicators color</summary>
+      <description>Color of active workspace and focused app indicators</description>
+    </key>
+
+    <key type="b" name="indicator-round-borders">
+      <default>true</default>
+      <summary>Round indicators borders</summary>
+      <description>Round borders of active workspace and focused app indicators</description>
+    </key>
+
+    <key type="b" name="indicator-swap-position">
+      <default>false</default>
+      <summary>Swap indicators position</summary>
+      <description>Move active app indicator to bottom and active workspace to top. This could break centering of labels, fix it manually using Spacing settings below</description>
+    </key>
+
+    <key type="b" name="indicator-show-background">
+      <default>false</default>
+      <summary>Show background for active workspace</summary>
+      <description>Show a background box around the current active workspace indicator</description>
+    </key>
+
+    <key type="s" name="indicator-background-color">
+      <default>"rgba(255,255,255,0.2)"</default>
+      <summary>Background color</summary>
+      <description>Background color for the active workspace indicator</description>
+    </key>
+
+    <key type="i" name="indicator-background-padding">
+      <default>4</default>
+      <summary>Background padding</summary>
+      <description>Padding around the workspace indicator background (affects both label and icons). Default: 4</description>
+    </key>
+
+    <key type="b" name="indicator-text-use-theme-color">
+      <default>false</default>
+      <summary>Use theme color for text</summary>
+      <description>Use the theme color for workspace text labels (similar to how icons are colored)</description>
+    </key>
+
+    <!-- PAGE 2 GROUP 2: WORKSPACES APPEARANCE -->
+
+    <key type="b" name="indicator-show-indexes">
+      <default>true</default>
+      <summary>Show workspace names</summary>
+      <description>Show the workspace names before the workspace icons</description>
+    </key>
+
+    <key type="b" name="indicator-hide-empty">
+      <default>false</default>
+      <summary>Hide empty workspaces indicator</summary>
+      <description>Hides the name of empty workspaces</description>
+    </key>
+
+    <key type="s" name="indicator-all-text">
+      <default>"ALL"</default>
+      <summary>Apps on all workspaces indicator text</summary>
+      <description>Text indicator to show when there are apps on all workspaces</description>
+    </key>
+
+    <key type="b" name="indicator-use-custom-names">
+      <default>false</default>
+      <summary>Use custom names for workspaces</summary>
+      <description>Display custom names instead of indexes. Enabling this settings activates the rename workspace UI (right click on workspace/keyboard shortcut)</description>
+    </key>
+
+    <!-- PAGE 2 GROUP 3: ICONS APPEARANCE -->
+
+    <key type="b" name="apps-symbolic-icons">
+      <default>false</default>
+      <summary>Use symbolic icons</summary>
+      <description>Use symbolic icons for apps</description>
+    </key>
+
+    <key type="b" name="apps-all-desaturate">
+      <default>false</default>
+      <summary>Desaturate all apps icons</summary>
+      <description>Show only black and white apps icons</description>
+    </key>
+
+    <key name="apps-inactive-effect" enum="org.gnome.shell.extensions.workspaces-indicator-by-open-apps.enum-apps-effects">
+      <default>"REDUCE OPACITY"</default>
+      <summary>Inactive apps effect</summary>
+      <description>Effect to apply to inactive (not focused) apps icons</description>
+    </key>
+
+    <key name="apps-minimized-effect" enum="org.gnome.shell.extensions.workspaces-indicator-by-open-apps.enum-apps-effects">
+      <default>"REDUCE OPACITY"</default>
+      <summary>Minimized apps effect</summary>
+      <description>Effect to apply to minimized apps icons</description>
+    </key>
+
+    <key type="b" name="apps-show-window-title">
+      <default>false</default>
+      <summary>Show window title</summary>
+      <description>Display the window title alongside the application icon</description>
+    </key>
+
+    <!-- PAGE 2 GROUP 4: SIZES AND SPACING -->
+
+    <key type="i" name="size-app-icon">
+      <default>20</default>
+      <summary>Application icon size</summary>
+      <description>Size of a single application icon. The icon is limited by the panel height (edit panel height with extensions like Just Perfection). Default: 20</description>
+    </key>
+
+    <key type="i" name="size-labels">
+      <default>12</default>
+      <summary>Labels font size</summary>
+      <description>Font sizes for all labels (workspace name, apps groups). Default: 12</description>
+    </key>
+
+    <key type="i" name="spacing-workspace-left">
+      <default>2</default>
+      <summary>Workspace spacing left</summary>
+      <description>Left spacing for a workspace indicator. Default: 2</description>
+    </key>
+
+    <key type="i" name="spacing-workspace-right">
+      <default>2</default>
+      <summary>Workspace spacing right</summary>
+      <description>Right spacing for a workspace indicator. Default: 2</description>
+    </key>
+
+    <key type="i" name="spacing-label-left">
+      <default>2</default>
+      <summary>Label spacing left</summary>
+      <description>Left spacing for a workspace label. Default: 2</description>
+    </key>
+
+    <key type="i" name="spacing-label-right">
+      <default>2</default>
+      <summary>Label spacing right</summary>
+      <description>Right spacing for a workspace label. Default: 2</description>
+    </key>
+
+    <key type="i" name="spacing-label-top">
+      <default>0</default>
+      <summary>Label spacing top</summary>
+      <description>Top spacing for a workspace label. Default: 0</description>
+    </key>
+
+    <key type="i" name="spacing-label-bottom">
+      <default>0</default>
+      <summary>Label spacing bottom</summary>
+      <description>Bottom spacing for a workspace label. Default: 0</description>
+    </key>
+
+    <key type="i" name="spacing-app-left">
+      <default>0</default>
+      <summary>App icon spacing left</summary>
+      <description>Left spacing for an application icon. Default: 0</description>
+    </key>
+
+    <key type="i" name="spacing-app-right">
+      <default>0</default>
+      <summary>App icon spacing right</summary>
+      <description>Right spacing for an application icon. Default: 0</description>
+    </key>
+
+    <key type="d" name="indicator-height-scale">
+      <default>1.0</default>
+      <summary>Global size scale</summary>
+      <description>Global scale multiplier applied to all sizes including icon sizes, spacings, indicators, padding, and font sizes. Default: 1.0 (no scaling)</description>
+    </key>
+
+    <!-- PAGE 3 GROUP 1: HIDE AND IGNORE APPS -->
+
+    <key type="i" name="icons-limit">
+      <default>0</default>
+      <summary>Icons limit</summary>
+      <description>Maximum number of icons displayed in a single inactive workspace indicator. Active workspace is always unlimited. 0 = unlimited</description>
+    </key>
+
+    <key name="icons-group" enum="org.gnome.shell.extensions.workspaces-indicator-by-open-apps.enum-icons-group">
+      <default>"OFF"</default>
+      <summary>Group icons of same application</summary>
+      <description>Show only one icon for each application in the workspace indicator</description>
+    </key>
+
+    <key name="icons-ignored" type="as">
+      <default>[]</default>
+      <summary>Ignored applications</summary>
+      <description>List of applications ignored (no icons will be shown for them)</description>
+    </key>
+
+    <key type="b" name="log-apps-id">
+      <default>false</default>
+      <summary>Log displayed applications ids</summary>
+      <description>Console log the ids of the applications currently running, to find the ids of the applications to ignore. Open log with "journalctl /usr/bin/gnome-shell -f -o cat"</description>
+    </key>
+
+    <!-- KEYBOARD SHORTCUTS -->
+
+    <key type="as" name="rename-workspace-shortcut">
+      <default>['&lt;Super&gt;&lt;Shift&gt;r']</default>
+      <summary>Rename active workspace shortcut</summary>
+      <description>Keyboard shortcut to rename the currently active workspace. If 'Use custom names for workspaces' is off, workspace renaming is disabled</description>
+    </key>
+
+  </schema>
+
+</schemalist>
+
