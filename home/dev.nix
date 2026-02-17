@@ -27,5 +27,7 @@
     # LaTeX + LanguageTool
     texliveFull
     languagetool
+
+    fastfetch
   ];
 }
