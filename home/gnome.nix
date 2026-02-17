@@ -53,6 +53,7 @@ in
 {
   home.packages = with pkgs; [
     gnomeExtensions.no-title-bar
+    gnomeExtensions.vitals
     authenticator
     kora-icon-theme
     zathura
@@ -101,6 +102,7 @@ in
       enabled-extensions = [
         "no-title-bar@jonaspoehler.de"
         "workspaces-by-open-apps@favo02.github.com"
+        "Vitals@CoreCoding.com"
       ];
       favorite-apps = [ ];
     };
@@ -117,11 +119,16 @@ in
 
     "org/gnome/shell/extensions/workspaces-indicator-by-open-apps" = {
       position-in-panel = "CENTER";
-      position-index = 0;
+      position-index = 1;
       indicator-show-indexes = true;
       apps-show-window-title = false;
       size-app-icon = 16;
       icons-group = "GROUP WITHOUT COUNT";
+    };
+
+    "org/gnome/shell/extensions/vitals" = {
+      position-in-panel = 1; # center
+      hot-sensors = [ "_processor_usage_" "_memory_usage_" ];
     };
 
     "org/gnome/desktop/wm/keybindings" = {
@@ -220,6 +227,7 @@ in
       color-scheme = "prefer-dark";
       enable-animations = false;
       icon-theme = "kora";
+      show-battery-percentage = true;
     };
 
     "org/gnome/desktop/input-sources" = {
