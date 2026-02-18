@@ -8,8 +8,8 @@
 
     shellAliases = {
       ll = "ls -l";
-      switch = "sudo nixos-rebuild switch --flake /etc/nixos#LabTop";
-      update = "sudo nix-channel --update && sudo nixos-rebuild switch --flake /etc/nixos#LabTop";
+      switch = "sudo nixos-rebuild switch --flake /etc/nixos#$HOST";
+      update = "sudo nix-channel --update && sudo nixos-rebuild switch --flake /etc/nixos#$HOST";
       sudo-nvim = "sudo -E nvim";
       edit-config = "cd /etc/nixos && codex";
       venv = "source .venv/bin/activate";
