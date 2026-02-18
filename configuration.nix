@@ -272,6 +272,25 @@
   # started in user sessions.
   # programs.mtr.enable = true;
   programs.zsh.enable = true;
+  programs.nix-ld = {
+    enable = true;
+    libraries = with pkgs; [
+      stdenv.cc.cc
+      zlib
+      openssl
+      libffi
+      libxml2
+      libssh
+      libsodium
+      bzip2
+      xz
+      zstd
+      curl
+      systemd
+      util-linux
+      glib
+    ];
+  };
   programs.gnupg.agent = {
      enable = true;
      enableSSHSupport = true;

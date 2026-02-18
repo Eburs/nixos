@@ -61,6 +61,7 @@ in
     nvim-depends-include
     nvim-depends-library
     nvim-depends-pkgconfig
+    fd
     ripgrep
   ];
 
@@ -73,6 +74,16 @@ in
     enable = true;
     package = pkgs.neovim-unwrapped;
     viAlias = true;
+    extraWrapperArgs = [
+      "--prefix"
+      "LD_LIBRARY_PATH"
+      ":"
+      "${config.home.profileDirectory}/lib/nvim-depends/lib"
+      "--prefix"
+      "NIX_LD_LIBRARY_PATH"
+      ":"
+      "${config.home.profileDirectory}/lib/nvim-depends/lib"
+    ];
 
     withNodeJs = true;
     withPython3 = true;

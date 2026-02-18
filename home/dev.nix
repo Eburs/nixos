@@ -14,6 +14,7 @@
     gdb
     ninja
     pkg-config
+    go
 
     # Python
     python3
