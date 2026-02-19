@@ -11,6 +11,7 @@ in
     Use NVIDIA open kernel modules (recommended for Turing/RTX/GTX 16xx and newer;
     set to false for older GPUs)
   '';
+  options.nvidia.persistenced.enable = lib.mkEnableOption "Enable nvidia-persistenced daemon";
 
   config = lib.mkMerge [
     (lib.mkIf cfgNvidia.enable {
@@ -18,6 +19,7 @@ in
       hardware.nvidia.modesetting.enable = true;
       hardware.nvidia.open = cfgNvidia.open;
       hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.latest;
+      hardware.nvidia.nvidiaPersistenced = cfgNvidia.persistenced.enable;
 
       # This option is likely wrong; see note below.
       # hardware.nvidia.datacenter = true;

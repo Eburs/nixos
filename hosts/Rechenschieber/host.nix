@@ -9,4 +9,5 @@
   networking.hostName = "Rechenschieber";
   gaming.enable = true;
   nvidia.enable = true;
+  nvidia.persistenced.enable = true;
 }

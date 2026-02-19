@@ -3,7 +3,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 {
   nixpkgs.config.allowUnfree = true;
@@ -289,6 +289,8 @@
       systemd
       util-linux
       glib
+    ] ++ lib.optionals config.nvidia.enable [
+      config.hardware.nvidia.package
     ];
   };
   programs.gnupg.agent = {
