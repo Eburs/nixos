@@ -275,20 +275,28 @@
   programs.nix-ld = {
     enable = true;
     libraries = with pkgs; [
-      stdenv.cc.cc
       zlib
-      openssl
-      libffi
-      libxml2
-      libssh
-      libsodium
-      bzip2
-      xz
       zstd
+      stdenv.cc.cc
       curl
-      systemd
+      openssl
+      attr
+      libssh
+      bzip2
+      libxml2
+      acl
+      libsodium
       util-linux
+      xz
+      systemd
       glib
+      libffi
+      libuuid
+      ncurses
+      readline
+      sqlite
+      expat
+      icu
     ] ++ lib.optionals config.nvidia.enable [
       config.hardware.nvidia.package
     ];

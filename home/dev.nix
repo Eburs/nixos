@@ -20,7 +20,6 @@
     python3
     python3Packages.pip
     python3Packages.jupyterlab
-    python3Packages.tensorboard
 
     # Julia
     julia
