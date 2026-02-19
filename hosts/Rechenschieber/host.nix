@@ -3,6 +3,7 @@
 {
   imports = [
     ./hardware-configuration.nix
+    ./omen-rgb.nix
   ];
 
   networking.hostName = "Rechenschieber";
