@@ -16,6 +16,19 @@
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  systemd.services.systemd-boot-reassert = {
+    description = "Reassert systemd-boot as first UEFI boot entry";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "local-fs.target" ];
+    unitConfig = {
+      ConditionPathExists = "/sys/firmware/efi/efivars";
+      RequiresMountsFor = [ config.boot.loader.efi.efiSysMountPoint ];
+    };
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.systemd}/bin/bootctl install --esp-path=${config.boot.loader.efi.efiSysMountPoint}";
+    };
+  };
   boot.plymouth = {
     enable = true;
     theme = "nixos-logo";
@@ -204,9 +217,25 @@
       experimental-features = [ "nix-command" "flakes" ];
     };
     gc = {
-      automatic = true;
-      dates = "weekly";
-      options = "--delete-older-than 14d";
+      automatic = false;
+    };
+  };
+
+  systemd.services.nix-gc-generations = {
+    description = "Collect garbage and keep last 5 system generations";
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = [
+        "${pkgs.nix}/bin/nix-env --profile /nix/var/nix/profiles/system --delete-generations +5"
+        "${pkgs.nix}/bin/nix-collect-garbage"
+      ];
+    };
+  };
+  systemd.timers.nix-gc-generations = {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "weekly";
+      Persistent = true;
     };
   };
 
