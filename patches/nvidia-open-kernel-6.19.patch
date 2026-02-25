@@ -1,0 +1,106 @@
+--- a/kernel-open/nvidia-uvm/uvm_hmm.c
++++ b/kernel-open/nvidia-uvm/uvm_hmm.c
+@@ -55,6 +55,7 @@
+ #include <linux/migrate.h>
+ #include <linux/userfaultfd_k.h>
+ #include <linux/memremap.h>
++#include <linux/version.h>
+ #include <linux/wait.h>
+ 
+ #include "uvm_common.h"
+@@ -2140,7 +2141,11 @@
+ 
+         UVM_ASSERT(!page_count(dpage));
+         UVM_ASSERT(!dpage->zone_device_data);
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 19, 0)
++        zone_device_page_init(dpage, NULL, 0);
++#else
+         zone_device_page_init(dpage);
++#endif
+         dpage->zone_device_data = gpu_chunk;
+         atomic64_inc(&va_block->hmm.va_space->hmm.allocated_page_count);
+     }
+--- a/kernel-open/nvidia-uvm/uvm_pmm_gpu.c
++++ b/kernel-open/nvidia-uvm/uvm_pmm_gpu.c
+@@ -176,6 +176,7 @@
+ #include "uvm_va_range.h"
+ #include "uvm_test.h"
+ #include "uvm_linux.h"
++#include <linux/version.h>
+ 
+ #if defined(CONFIG_PCI_P2PDMA) && defined(NV_STRUCT_PAGE_HAS_ZONE_DEVICE_DATA)
+ #include <linux/pci-p2pdma.h>
+@@ -3042,6 +3043,13 @@
+                                  &gpu->pmm.root_chunks.va_block_lazy_free_q_item);
+ }
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 19, 0)
++static void devmem_folio_free(struct folio *folio)
++{
++    devmem_page_free(&folio->page);
++}
++#endif
++
+ // This is called by HMM when the CPU faults on a ZONE_DEVICE private entry.
+ static vm_fault_t devmem_fault(struct vm_fault *vmf)
+ {
+@@ -3060,7 +3068,11 @@
+ 
+ static const struct dev_pagemap_ops uvm_pmm_devmem_ops =
+ {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 19, 0)
++    .folio_free = devmem_folio_free,
++#else
+     .page_free = devmem_page_free,
++#endif
+     .migrate_to_ram = devmem_fault_entry,
+ };
+ 
+@@ -3157,15 +3169,35 @@
+ }
+ #endif
+ 
++#if defined(CONFIG_PCI_P2PDMA) && defined(NV_STRUCT_PAGE_HAS_ZONE_DEVICE_DATA)
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 19, 0)
++static void device_p2p_folio_free(struct folio *folio)
++{
++    device_p2p_page_free(&folio->page);
++}
++#endif
++#endif
++
+ #if UVM_CDMM_PAGES_SUPPORTED()
+ static void device_coherent_page_free(struct page *page)
+ {
+     device_p2p_page_free(page);
+ }
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 19, 0)
++static void device_coherent_folio_free(struct folio *folio)
++{
++    device_coherent_page_free(&folio->page);
++}
++#endif
++
+ static const struct dev_pagemap_ops uvm_device_coherent_pgmap_ops =
+ {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 19, 0)
++    .folio_free = device_coherent_folio_free,
++#else
+     .page_free = device_coherent_page_free,
++#endif
+ };
+ 
+ static NV_STATUS uvm_pmm_cdmm_init(uvm_parent_gpu_t *parent_gpu)
+@@ -3302,7 +3334,11 @@
+ 
+ static const struct dev_pagemap_ops uvm_device_p2p_pgmap_ops =
+ {
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 19, 0)
++    .folio_free = device_p2p_folio_free,
++#else
+     .page_free = device_p2p_page_free,
++#endif
+ };
+ 
+ void uvm_pmm_gpu_device_p2p_init(uvm_parent_gpu_t *parent_gpu)

@@ -18,7 +18,15 @@ in
       services.xserver.videoDrivers = [ "nvidia" ];
       hardware.nvidia.modesetting.enable = true;
       hardware.nvidia.open = cfgNvidia.open;
-      hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.latest;
+      hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.latest.overrideAttrs (old: {
+        passthru =
+          (old.passthru or { })
+          // {
+            open = old.passthru.open.overrideAttrs (oldOpen: {
+              patches = (oldOpen.patches or []) ++ [ ../patches/nvidia-open-kernel-6.19.patch ];
+            });
+          };
+      });
       hardware.nvidia.nvidiaPersistenced = cfgNvidia.persistenced.enable;
 
       # This option is likely wrong; see note below.
