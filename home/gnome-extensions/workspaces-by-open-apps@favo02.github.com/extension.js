@@ -20,6 +20,8 @@ export default class WorkspacesByOpenApps extends Extension {
     this._container = new St.BoxLayout()
     const box = CONSTANTS.PANEL_BOX[this._settings.position_in_panel]
     main.panel[box].insert_child_at_index(this._container, this._settings.position_index)
+    // Expose indicator in statusArea so multi-monitor bars can mirror it
+    main.panel.statusArea["workspacesByOpenApps"] = this._container
 
     // setup keyboard shortcuts
     this._setup_keybindings()
@@ -37,6 +39,9 @@ export default class WorkspacesByOpenApps extends Extension {
     this._remove_keybindings() // remove keyboard shortcuts
 
     main.panel.statusArea["activities"]?.show() // restore activities
+    if (main.panel.statusArea["workspacesByOpenApps"] === this._container) {
+      delete main.panel.statusArea["workspacesByOpenApps"]
+    }
 
     this._settings = null
     this._container.destroy()

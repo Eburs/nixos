@@ -37,8 +37,17 @@ in
       services.ananicy.enable = true;
       services.ananicy.package = pkgs.ananicy-cpp;
 
-      programs.steam.enable = true;
+      programs.steam = {
+        enable = true;
+        extraCompatPackages = [
+          pkgs.proton-ge-bin
+        ];
+      };
       programs.gamemode.enable = true;
+
+      environment.sessionVariables = {
+        PROTON_ENABLE_NGX_UPDATER = "1";
+      };
 
       environment.systemPackages = with pkgs; [
         steam-run

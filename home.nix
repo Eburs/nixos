@@ -1,7 +1,10 @@
 { ... }:
 {
   imports = [
-    ./home/gnome.nix
+    ./home/hyprland.nix
+    ./home/fonts.nix
+    ./home/programs.nix
+    ./home/audio.nix
     ./home/dev.nix
     ./home/vpn.nix
     ./home/neovim.nix

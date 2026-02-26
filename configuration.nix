@@ -3,8 +3,57 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, lib, pkgs, ... }:
-
+{ config, lib, pkgs, inputs, ... }:
+let
+  hyprlandSddm = pkgs.writeShellScriptBin "hyprland-sddm" ''
+    export XDG_SESSION_TYPE=wayland
+    export XDG_SESSION_DESKTOP=Hyprland
+    export XDG_CURRENT_DESKTOP=Hyprland
+    export MOZ_ENABLE_WAYLAND=1
+    export QT_QPA_PLATFORM=wayland
+    export GDK_BACKEND=wayland
+    export SDL_VIDEODRIVER=wayland
+    export CLUTTER_BACKEND=wayland
+    export __EGL_VENDOR_LIBRARY_FILENAMES=/run/opengl-driver/share/glvnd/egl_vendor.d/10_nvidia.json
+    export __GLX_VENDOR_LIBRARY_NAME=nvidia
+    export GBM_BACKEND=nvidia-drm
+    export WLR_NO_HARDWARE_CURSORS=1
+    export WLR_RENDERER_ALLOW_SOFTWARE=1
+    export WLR_BACKENDS=drm,libinput
+    ${lib.optionalString (config.networking.hostName == "Skynet") ''
+      export WLR_DRM_DEVICES=/dev/dri/card1
+      export AQ_DRM_DEVICES=/dev/dri/card1
+    ''}
+    exec ${pkgs.hyprland}/bin/Hyprland
+  '';
+  hyprlandSddmSession = pkgs.stdenvNoCC.mkDerivation {
+    pname = "hyprland-sddm-session";
+    version = "1";
+    dontUnpack = true;
+    passthru.providedSessions = [ "hyprland-sddm" ];
+    installPhase = ''
+      mkdir -p $out/share/wayland-sessions
+      cat > $out/share/wayland-sessions/hyprland-sddm.desktop <<'EOF'
+      [Desktop Entry]
+      Name=Hyprland (sddm)
+      Comment=Hyprland with enforced DRM device env
+      Exec=${hyprlandSddm}/bin/hyprland-sddm
+      Type=Application
+      EOF
+    '';
+  };
+  sddmPkg =
+    let
+      qt6Sddm = lib.attrByPath [ "kdePackages" "sddm" ] null pkgs;
+      qt5Sddm = lib.attrByPath [ "libsForQt5" "sddm" ] null pkgs;
+    in
+      if pkgs ? sddm-qt5 then pkgs.sddm-qt5
+      else if pkgs ? sddm then pkgs.sddm
+      else if pkgs ? sddm-qt6 then pkgs.sddm-qt6
+      else if qt6Sddm != null then qt6Sddm
+      else if qt5Sddm != null then qt5Sddm
+      else throw "No SDDM package found in this nixpkgs.";
+in
 {
   nixpkgs.config.allowUnfree = true;
   imports =
@@ -84,6 +133,10 @@
     "rd.systemd.show_status=false"
     "rd.udev.log_level=3"
     "vt.global_cursor_default=0"
+  ] ++ lib.optionals config.nvidia.enable [
+    "nvidia-drm.modeset=1"
+    "nvidia_drm.fbdev=1"
+    "module_blacklist=simpledrm"
   ];
 
   # Use latest kernel.
@@ -116,13 +169,59 @@
     LC_TIME = "de_DE.UTF-8";
   };
 
-  # Enable the X11 windowing system.
-  services.xserver.enable = false;
+  # Enable X11 for SDDM (Hyprland remains Wayland).
+  services.xserver.enable = true;
 
-  # Enable the GNOME Desktop Environment.
-  services.displayManager.gdm.enable = true;
-  services.displayManager.gdm.wayland = true;
-  services.desktopManager.gnome.enable = true;
+  # Hyprland (Wayland) without GNOME, using SDDM.
+  services.displayManager.gdm.enable = false;
+  services.displayManager.gdm.wayland = false;
+  services.displayManager.sddm = {
+    enable = true;
+    wayland.enable = false;
+    package = sddmPkg;
+    theme = "breeze";
+    extraPackages = [
+      pkgs.kdePackages.breeze
+    ];
+  };
+  services.displayManager.defaultSession = "hyprland-sddm";
+  services.displayManager.sessionPackages = [ hyprlandSddmSession ];
+  services.displayManager.sddm.settings = {
+    General = {
+      Session = "hyprland-sddm.desktop";
+    };
+  };
+  services.displayManager.generic.environment = lib.optionalAttrs (config.networking.hostName == "Skynet") {
+    WLR_DRM_DEVICES = "/dev/dri/card2";
+    AQ_DRM_DEVICES = "/dev/dri/card2";
+    GBM_BACKEND = "nvidia-drm";
+    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+    __EGL_VENDOR_LIBRARY_FILENAMES = "/run/opengl-driver/share/glvnd/egl_vendor.d/10_nvidia.json";
+    LIBVA_DRIVER_NAME = "nvidia";
+  };
+  services.desktopManager.gnome.enable = false;
+  programs.hyprland = {
+    enable = true;
+    xwayland.enable = true;
+  };
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true;
+    extraPackages = with pkgs; [
+      mesa
+    ];
+    extraPackages32 = with pkgs.pkgsi686Linux; [
+      mesa
+    ];
+  };
+  services.udev.packages = lib.mkIf config.nvidia.enable [
+    config.hardware.nvidia.package
+  ];
+  services.greetd.enable = false;
+  xdg.portal = {
+    enable = true;
+    extraPortals = [ pkgs.xdg-desktop-portal-hyprland ];
+  };
 
   # Ensure German keyboard layout for GDM/Wayland sessions.
   services.xserver.xkb = {
@@ -168,13 +267,14 @@
     isNormalUser = true;
     description = "Erik Burs";
     shell = pkgs.zsh;
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "video" ];
     packages = with pkgs; [
     ];
   };
 
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
+  home-manager.extraSpecialArgs = { inherit inputs; };
   home-manager.users.eburs = import ./home.nix;
 
   # Install firefox.
@@ -184,6 +284,23 @@
   environment.variables = {
     BROWSER = "firefox";
   };
+  environment.sessionVariables =
+    lib.mkIf config.nvidia.enable (
+      {
+        __EGL_VENDOR_LIBRARY_FILENAMES = "/run/opengl-driver/share/glvnd/egl_vendor.d/10_nvidia.json";
+        __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+        GBM_BACKEND = "nvidia-drm";
+        WLR_NO_HARDWARE_CURSORS = "1";
+      }
+      // (lib.optionalAttrs (config.networking.hostName == "Skynet") {
+        WLR_DRM_DEVICES = "/dev/dri/card2";
+        AQ_DRM_DEVICES = "/dev/dri/card2";
+        GBM_BACKEND = "nvidia-drm";
+        __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+        __EGL_VENDOR_LIBRARY_FILENAMES = "/run/opengl-driver/share/glvnd/egl_vendor.d/10_nvidia.json";
+        LIBVA_DRIVER_NAME = "nvidia";
+      })
+    );
 
   # Allow wheel group to sudo without password
   security.sudo.wheelNeedsPassword = false;
@@ -207,6 +324,14 @@
     "L+ /opt/cisco/anyconnect/profile/heidelberg.xml - - - - /etc/cisco/anyconnect/profile/heidelberg.xml"
     "d /opt/cisco/secureclient/vpn/profile 0755 root root - -"
     "L+ /opt/cisco/secureclient/vpn/profile/heidelberg.xml - - - - /etc/cisco/anyconnect/profile/heidelberg.xml"
+    "c /dev/nvidia0 0660 root video - 195:0"
+    "c /dev/nvidiactl 0660 root video - 195:255"
+    "c /dev/nvidia-modeset 0660 root video - 195:254"
+    "c /dev/nvidia-uvm 0660 root video - 234:0"
+    "c /dev/nvidia-uvm-tools 0660 root video - 234:1"
+    "d /dev/nvidia-caps 0755 root root - -"
+    "c /dev/nvidia-caps/nvidia-cap1 0660 root video - 238:1"
+    "c /dev/nvidia-caps/nvidia-cap2 0660 root video - 238:2"
   ];
 
 
@@ -222,11 +347,11 @@
   };
 
   systemd.services.nix-gc-generations = {
-    description = "Collect garbage and keep last 5 system generations";
+    description = "Collect garbage and keep last 180 days of system generations";
     serviceConfig = {
       Type = "oneshot";
       ExecStart = [
-        "${pkgs.nix}/bin/nix-env --profile /nix/var/nix/profiles/system --delete-generations +5"
+        "${pkgs.nix}/bin/nix-env --profile /nix/var/nix/profiles/system --delete-generations +180"
         "${pkgs.nix}/bin/nix-collect-garbage"
       ];
     };
@@ -295,6 +420,7 @@
      gcc
      codex
      lua
+     hyprlandSddm
   ];
 
   # Some programs need SUID wrappers, can be configured further or are

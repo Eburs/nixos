@@ -10,6 +10,34 @@ let
     cp -a ${wboaSrc}/* $out/
   '';
 
+  swamSrc = builtins.path {
+    path = ./gnome-extensions;
+    name = "gnome-extensions";
+  } + "/simulate-switching-workspaces-on-active-monitor@micheledaros.com";
+
+  switchWorkspacesOnActiveMonitor = pkgs.runCommand "simulate-switching-workspaces-on-active-monitor-extension" {
+    nativeBuildInputs = [ pkgs.glib ];
+  } ''
+    mkdir -p $out
+    cp -a ${swamSrc}/. $out/
+    chmod -R u+w $out
+    glib-compile-schemas $out/schemas
+  '';
+
+  mmbSrc = builtins.path {
+    path = ./gnome-extensions;
+    name = "gnome-extensions";
+  } + "/multi-monitors-bar@frederykabryan";
+
+  multiMonitorBar = pkgs.runCommand "multi-monitors-bar-extension" {
+    nativeBuildInputs = [ pkgs.glib ];
+  } ''
+    mkdir -p $out
+    cp -a ${mmbSrc}/. $out/
+    chmod -R u+w $out
+    glib-compile-schemas $out/schemas
+  '';
+
   stoatVersion = "1.1.12";
   stoatArch = if pkgs.stdenv.hostPlatform.system == "x86_64-linux" then "x64"
     else if pkgs.stdenv.hostPlatform.system == "aarch64-linux" then "arm64"
@@ -72,6 +100,14 @@ in
     source = workspacesByOpenApps;
     recursive = true;
   };
+  xdg.dataFile."gnome-shell/extensions/multi-monitors-bar@frederykabryan" = {
+    source = multiMonitorBar;
+    recursive = true;
+  };
+  xdg.dataFile."gnome-shell/extensions/simulate-switching-workspaces-on-active-monitor@micheledaros.com" = {
+    source = switchWorkspacesOnActiveMonitor;
+    recursive = true;
+  };
 
   xdg.dataFile."easyeffects/output/GentleDynamics.json" = {
     source = ./easyeffects/GentleDynamics.json;
@@ -100,7 +136,9 @@ in
     "org/gnome/shell" = {
       disable-user-extensions = false;
       enabled-extensions = [
+        "multi-monitors-bar@frederykabryan"
         "no-title-bar@jonaspoehler.de"
+        "simulate-switching-workspaces-on-active-monitor@micheledaros.com"
         "workspaces-by-open-apps@favo02.github.com"
         "Vitals@CoreCoding.com"
       ];
@@ -131,10 +169,13 @@ in
       hot-sensors = [ "_processor_usage_" "_memory_usage_" ];
     };
 
-    "org/gnome/desktop/wm/keybindings" = {
-      close = [ "<Super>q" ];
-      minimize = [ "<Super>m" ];
-      toggle-fullscreen = [ "<Super>f" ];
+    "org/gnome/shell/extensions/multi-monitors-add-on" = {
+      show-panel = true;
+      show-date-time = true;
+      show-activities = false;
+    };
+
+    "org/gnome/shell/extensions/simulate-switching-workspaces-on-active-monitor" = {
       switch-to-workspace-1 = [ "<Super>1" ];
       switch-to-workspace-2 = [ "<Super>2" ];
       switch-to-workspace-3 = [ "<Super>3" ];
@@ -145,6 +186,22 @@ in
       switch-to-workspace-8 = [ "<Super>8" ];
       switch-to-workspace-9 = [ "<Super>9" ];
       switch-to-workspace-10 = [ "<Super>0" ];
+    };
+
+    "org/gnome/desktop/wm/keybindings" = {
+      close = [ "<Super>q" ];
+      minimize = [ "<Super>m" ];
+      toggle-fullscreen = [ "<Super>f" ];
+      switch-to-workspace-1 = [ ];
+      switch-to-workspace-2 = [ ];
+      switch-to-workspace-3 = [ ];
+      switch-to-workspace-4 = [ ];
+      switch-to-workspace-5 = [ ];
+      switch-to-workspace-6 = [ ];
+      switch-to-workspace-7 = [ ];
+      switch-to-workspace-8 = [ ];
+      switch-to-workspace-9 = [ ];
+      switch-to-workspace-10 = [ ];
       move-to-workspace-1 = [ "<Super><Shift>1" ];
       move-to-workspace-2 = [ "<Super><Shift>2" ];
       move-to-workspace-3 = [ "<Super><Shift>3" ];

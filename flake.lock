@@ -1,5 +1,74 @@
 {
   "nodes": {
+    "dots-hyprland": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1772006431,
+        "narHash": "sha256-NuQKOKmlNoyz82jcfxXbp/n3IybyRR1Yoxa7/orPoJo=",
+        "owner": "end-4",
+        "repo": "dots-hyprland",
+        "rev": "d11ef2adefa65b90a759a5b414f31955175fac13",
+        "type": "github"
+      },
+      "original": {
+        "owner": "end-4",
+        "repo": "dots-hyprland",
+        "type": "github"
+      }
+    },
+    "dots-nixpkgs": {
+      "locked": {
+        "lastModified": 1746378225,
+        "narHash": "sha256-OeRSuL8PUjIfL3Q0fTbNJD/fmv1R+K2JAOqWJd3Oceg=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "93e8cdce7afc64297cfec447c311470788131cd9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "93e8cdce7afc64297cfec447c311470788131cd9",
+        "type": "github"
+      }
+    },
+    "dots-quickshell": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1761821581,
+        "narHash": "sha256-nLuc6jA7z+H/6bHPEBSOYPbz7RtvNCZiTKmYItJuBmM=",
+        "owner": "quickshell-mirror",
+        "repo": "quickshell",
+        "rev": "db1777c20b936a86528c1095cbcb1ebd92801402",
+        "type": "github"
+      },
+      "original": {
+        "owner": "quickshell-mirror",
+        "repo": "quickshell",
+        "rev": "db1777c20b936a86528c1095cbcb1ebd92801402",
+        "type": "github"
+      }
+    },
+    "dots-shapes": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1771173575,
+        "narHash": "sha256-p1Ia0oQCWnik2saVMgv7IABkaJV43PoY7uuwXjXlc+Q=",
+        "owner": "end-4",
+        "repo": "rounded-polygon-qmljs",
+        "rev": "e31ec4cb4ebf6a46b267f5c42eabf6874916fa16",
+        "type": "github"
+      },
+      "original": {
+        "owner": "end-4",
+        "repo": "rounded-polygon-qmljs",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -38,6 +107,10 @@
     },
     "root": {
       "inputs": {
+        "dots-hyprland": "dots-hyprland",
+        "dots-nixpkgs": "dots-nixpkgs",
+        "dots-quickshell": "dots-quickshell",
+        "dots-shapes": "dots-shapes",
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs"
       }
